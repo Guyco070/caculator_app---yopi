@@ -1,4 +1,4 @@
-# Yopi calculator app :calculator:
+# Yopi Calculator app :iphone:
 
 ---
 
