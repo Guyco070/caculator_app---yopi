@@ -17,7 +17,6 @@ class CalculatorScreen extends StatelessWidget {
       body: const Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          Spacer(),
           CustomTextField("Enter A Math Problem"),
           ButtonsGrid(),
         ],
