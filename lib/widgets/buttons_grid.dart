@@ -9,25 +9,51 @@ class ButtonsGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: MediaQuery.of(context).size.height - 275,
-      child: GridView.count(
-          crossAxisCount: 4,
-          mainAxisSpacing: 5,
-          crossAxisSpacing: 5,
-          padding: const EdgeInsets.all(15),
-          children: [
-            ...numbersValues.sublist(1,4).map((number) => Button(value: number.toString())), // 1..3
-            Button(value: actionsValues[0]), // x
+      child: const CustomGridView()
+    );
+  }
+}
 
-            ...numbersValues.sublist(4, 7).map((number) => Button(value: number.toString())), // 4..6
-            Button(value: actionsValues[1]), // /
+class CustomGridView extends StatelessWidget {
+  const CustomGridView({super.key});
 
-            ...numbersValues.sublist(7, 10).map((number) => Button(value: number.toString())), // 7..9
-            Button(value: actionsValues[2]), // +
-
-            Button(value: numbersValues[0].toString()),
-            ...actionsValues.sublist(3, 6).map((value) => Button(value: value)), // ., =, -
-          ]
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: extraActionValues.map((number) => Expanded(child: Button(value: number.toString()))).toList(), // %...
         ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ...numbersValues.sublist(1,4).map((number) => Expanded(child: Button(value: number.toString()))), // 1..3
+            Expanded(child: Button(value: actionsValues[0])), // x
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ...numbersValues.sublist(4, 7).map((number) => Expanded(child: Button(value: number.toString()))), // 4..6
+            Expanded(child: Button(value: actionsValues[1])), // /
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ...numbersValues.sublist(7, 10).map((number) => Expanded(child: Button(value: number.toString()))), // 7..9
+            Expanded(child: Button(value: actionsValues[2])), // +
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(child: Button(value: numbersValues[0].toString())), // 0
+            ...actionsValues.sublist(3, 6).map((value) => Expanded(child: Button(value: value))), // ., =, -
+          ],
+        ),
+      ],
     );
   }
 }

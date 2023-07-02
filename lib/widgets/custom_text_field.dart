@@ -38,36 +38,31 @@ class CustomTextField extends StatelessWidget {
                           width: 2.0,
                         )
                   ),
-              child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(onPressed: calculator.deleteChar, 
-                            icon: Icon(
-                              Icons.backspace_outlined,
-                              color: color.withOpacity(0.9),
-                            )),
-                          Center(
-                            child: Text(
-                              calculator.value ?? hintText,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: calculator.value == null ? color.withOpacity(0.7) : color,
-                                fontWeight: FontWeight.w500
-                              ),
-                            ),
-                          ),
-                          IconButton(onPressed: calculator.clearValue, 
-                            icon: Icon(
-                              Icons.clear,
-                              color: color.withOpacity(0.9),
-                            ))
-                        ],
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(onPressed: calculator.deleteChar, 
+                    icon: Icon(
+                      Icons.backspace_outlined,
+                      color: color.withOpacity(0.9),
+                    )),
+                  Center(
+                    child: Text(
+                      calculator.value ?? hintText,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: calculator.value == null ? color.withOpacity(0.7) : color,
+                        fontWeight: FontWeight.w500
                       ),
-                    ],
+                    ),
                   ),
+                  IconButton(onPressed: calculator.clearValue, 
+                    icon: Icon(
+                      Icons.clear,
+                      color: color.withOpacity(0.9),
+                    ))
+                ],
+              ),
             ),
           ),
               TextButton(

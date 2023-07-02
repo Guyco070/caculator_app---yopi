@@ -22,7 +22,8 @@ class Button extends StatelessWidget {
   Widget build(BuildContext context) {
     const Color borderColor =  Colors.black45;
 
-    late final double size = MediaQuery.of(context).size.width / 4.6;
+    final Size mQsize = MediaQuery.of(context).size;
+    final double size = mQsize.width / 4.6 > mQsize.height / 5.6 ? mQsize.width / 4.6 : mQsize.height / (2*5);
     
     final List<Color?> colors = getColors(context);
     final Color fillColor = colors[0]!;
@@ -30,32 +31,35 @@ class Button extends StatelessWidget {
     final Color? textColor = colors[2];
   
 
-    return Material(
-      elevation: 5,
-      borderRadius: BorderRadius.circular(30),
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: fillColor,
-          borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: borderColor)
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
+    return Padding(
+      padding: const EdgeInsets.all(2.0),
+      child: Material(
+        elevation: 5,
+        borderRadius: BorderRadius.circular(30),
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            color: fillColor,
             borderRadius: BorderRadius.circular(30),
-            splashColor: splashColor,
-            onTap: () => Provider.of<Calculator>(context, listen: false).calculate(value, context),
-            child: Center(
-              child: Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
+            border: Border.all(color: borderColor)
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(30),
+              splashColor: splashColor,
+              onTap: () => Provider.of<Calculator>(context, listen: false).calculate(value, context),
+              child: Center(
+                child: Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: textColor,
+                    ),
                   ),
-                ),
+              ),
             ),
           ),
         ),
