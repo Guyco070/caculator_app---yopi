@@ -78,30 +78,6 @@ class Calculator with ChangeNotifier {
     print("calc $inputeValues");
     if(newValue == "%" && inputeValues.lastOrNull == "√") return;
 
-    if(newValue == "√") {
-      if(inputeValues.isEmpty 
-        || (inputeValues.isNotEmpty
-            && (double.tryParse(inputeValues.last.toString()) == null 
-              && actionsValues.contains(inputeValues.last)))){
-          value = (value ?? "") + newValue;
-        
-          inputeValues.add(newValue);
-          
-          notifyListeners();
-          return;
-        } else if(double.tryParse(inputeValues.last.toString()) != null ) {   
-            final sqrtVal = sqrt(inputeValues.last);
-            value = fixeAfterDot(sqrtVal.toString(), 4);
-            prevValuesList.add("√${fixeAfterDot(inputeValues.last.toString(), 4)} = ${fixeAfterDot(sqrtVal.toString(), 4)}");
-            inputeValues.removeLast();
-            inputeValues.add(sqrtVal);
-            notifyListeners();
-            return;
-        } else {
-          return;
-        }
-    }
-
     final double? newValTP = double.tryParse(newValue);
     
     if(newValTP != null){
@@ -152,7 +128,22 @@ class Calculator with ChangeNotifier {
         return;
       }
       
-      if(inputeValues.length > 1 && inputeValues[inputeValues.length - 2] == "√") squareRootAction(newValue);
+
+      if(inputeValues.length > 1 && inputeValues[inputeValues.length - 2] == "√") {
+        final int squareRootIndex = inputeValues.indexOf("√");
+
+        double sqrtVal = sqrt(inputeValues[squareRootIndex + 1]);
+        inputeValues.removeLast();
+        inputeValues.add(sqrtVal);
+
+        value = value!.substring(0, squareRootIndex == -1 ? 0 : squareRootIndex) + fixeAfterDot(inputeValues.last.toString(), 4);
+        if(newValue == "=") {
+          inputeValues.clear();
+          inputeValues.add(double.parse(value!));
+          notifyListeners();
+          return;
+        }
+      }
       
       // in case only 1 number is included
       if(inputeValues.length < 3) {
@@ -165,7 +156,7 @@ class Calculator with ChangeNotifier {
         notifyListeners();
         return;
       } else {
-        // %
+
         late final int presIndex;
         presIndex = inputeValues.indexOf("%");
         if(presIndex != -1){
@@ -178,7 +169,6 @@ class Calculator with ChangeNotifier {
           inputeValues.removeAt(presIndex);
         }
 
-        // 
         switch(inputeValues[1]) {
           case "x": value = (inputeValues[0] * inputeValues[2]).toString();
             break;
