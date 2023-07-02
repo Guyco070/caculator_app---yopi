@@ -42,17 +42,40 @@ class History extends StatelessWidget {
         child: Column(
           children: [
             Column(
-              children: reversedPrevList.map((e) => Padding(
+              children: reversedPrevList.map((e){
+                final List<String> seperated = e.split(" ");
+                return Padding(
                   padding: const EdgeInsets.all(2.0),
                   child: Material(
                     elevation: 1,
                     color: Colors.blueGrey.shade100,
                     borderRadius: BorderRadius.circular(5),
                     child: ListTile(
-                      title: Text(e)
+                      title: Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: seperated[0],
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: color
+                              ),
+                            ),
+                            TextSpan(
+                              text: " = ${seperated[2]}",
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: color,
+                                fontWeight: FontWeight.bold
+                              ),
+                            )
+                          ]
+                        )
+                      )
                     ),
                   ),
-                )).toList(),
+                );
+              }).toList(),
             ),
             TextButton(onPressed: calculator.clearHistory, child: const Text("Clear History"))
           ],

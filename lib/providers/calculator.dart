@@ -80,18 +80,26 @@ class Calculator with ChangeNotifier {
 
     if(newValue == "√") {
       if(inputeValues.isEmpty 
-        || (inputeValues.isNotEmpty 
-            && (double.tryParse(inputeValues[inputeValues.length - 1]) == null 
-              && actionsValues.contains(inputeValues[inputeValues.length - 1])))){
+        || (inputeValues.isNotEmpty
+            && (double.tryParse(inputeValues.last.toString()) == null 
+              && actionsValues.contains(inputeValues.last)))){
           value = (value ?? "") + newValue;
         
           inputeValues.add(newValue);
           
           notifyListeners();
           return;
+        } else if(double.tryParse(inputeValues.last.toString()) != null ) {   
+            final sqrtVal = sqrt(inputeValues.last);
+            value = fixeAfterDot(sqrtVal.toString(), 4);
+            prevValuesList.add("√${fixeAfterDot(inputeValues.last.toString(), 4)} = ${fixeAfterDot(sqrtVal.toString(), 4)}");
+            inputeValues.removeLast();
+            inputeValues.add(sqrtVal);
+            notifyListeners();
+            return;
         } else {
-        return;
-      }
+          return;
+        }
     }
 
     final double? newValTP = double.tryParse(newValue);
@@ -144,21 +152,7 @@ class Calculator with ChangeNotifier {
         return;
       }
       
-      if(inputeValues.length > 1 && inputeValues[inputeValues.length - 2] == "√") {
-        final int squareRootIndex = inputeValues.indexOf("√");
-
-        double sqrtVal = sqrt(inputeValues[squareRootIndex + 1]);
-        inputeValues.removeLast();
-        inputeValues.add(sqrtVal);
-
-        value = value!.substring(0, squareRootIndex == -1 ? 0 : squareRootIndex) + fixeAfterDot(inputeValues.last.toString(), 4);
-        if(newValue == "=") {
-          inputeValues.clear();
-          inputeValues.add(double.parse(value!));
-          notifyListeners();
-          return;
-        }
-      }
+      if(inputeValues.length > 1 && inputeValues[inputeValues.length - 2] == "√") squareRootAction(newValue);
       
       // in case only 1 number is included
       if(inputeValues.length < 3) {
@@ -171,6 +165,7 @@ class Calculator with ChangeNotifier {
         notifyListeners();
         return;
       } else {
+        // %
         late final int presIndex;
         presIndex = inputeValues.indexOf("%");
         if(presIndex != -1){
@@ -183,6 +178,7 @@ class Calculator with ChangeNotifier {
           inputeValues.removeAt(presIndex);
         }
 
+        // 
         switch(inputeValues[1]) {
           case "x": value = (inputeValues[0] * inputeValues[2]).toString();
             break;
@@ -225,6 +221,21 @@ class Calculator with ChangeNotifier {
       }
 
     }
+  }
+
+  void squareRootAction(String newValue) {
+    final int squareRootIndex = inputeValues.indexOf("√");
+    
+    double sqrtVal = sqrt(inputeValues[squareRootIndex + 1]);
+    inputeValues.add(double.parse(fixeAfterDot(sqrtVal.toString(), 4)));
+    
+    if(newValue == "=" && inputeValues.length <= 2) {
+      value = value!.substring(0, squareRootIndex == -1 ? 0 : squareRootIndex) + fixeAfterDot(sqrtVal.toString(), 4);
+      prevValuesList.add("√${fixeAfterDot(inputeValues[squareRootIndex + 1].toString(), 4)} = ${fixeAfterDot(sqrtVal.toString(), 4)}");
+    } else {
+      value = value!.substring(0, squareRootIndex == -1 ? 0 : squareRootIndex) + newValue + fixeAfterDot(inputeValues.last.toString(), 4);
+    }    
+    inputeValues.removeRange(squareRootIndex, squareRootIndex + 2);
   }
 
   String fixeAfterDot(String value, int number){
