@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart' hide Action;
 
 final List<int> numbersValues = List.generate(10, (index) => index);
@@ -10,6 +12,11 @@ final List<String> actionsValues = [
     "=",
     "-",
   ];
+
+final List<String> extraActionValues = [
+  "%",
+  "√"
+];
 
 class Calculator with ChangeNotifier {
   String? value;
@@ -45,15 +52,22 @@ class Calculator with ChangeNotifier {
   deleteChar(){
     if(value == null) return;
     String last = inputeValues.last.toString();
+    final int? lastValTPI = double.tryParse(last)?.toInt();
+    last = lastValTPI != null && lastValTPI == double.parse(last) ? lastValTPI.toString() : last;
     last = last.substring(0, last.length-1);
 
     inputeValues.removeLast();
 
-    final double? lastValTP = double.tryParse(last);
+    final double? lastValTPB = double.tryParse(last);
 
-    if(lastValTP != null){
+    if(lastValTPB != null){
       inputeValues.add(last);
     }
+
+    if(inputeValues.isEmpty){
+      clearValue();
+      return;
+    } 
 
     final subString = value!.substring(0, value!.length-1);
     value = subString.isEmpty ? null : subString;
@@ -61,6 +75,25 @@ class Calculator with ChangeNotifier {
   }
 
   calculate(String newValue, BuildContext context){
+    print("calc $inputeValues");
+    if(newValue == "%" && inputeValues.lastOrNull == "√") return;
+
+    if(newValue == "√") {
+      if(inputeValues.isEmpty 
+        || (inputeValues.isNotEmpty 
+            && (double.tryParse(inputeValues[inputeValues.length - 1]) == null 
+              && actionsValues.contains(inputeValues[inputeValues.length - 1])))){
+          value = (value ?? "") + newValue;
+        
+          inputeValues.add(newValue);
+          
+          notifyListeners();
+          return;
+        } else {
+        return;
+      }
+    }
+
     final double? newValTP = double.tryParse(newValue);
     
     if(newValTP != null){
@@ -73,7 +106,7 @@ class Calculator with ChangeNotifier {
         inputeValues.removeLast();
         inputeValues.add(double.parse(fixeAfterDot(last.toString(), 0).toString() + newValue));
       } else {
-        if(last == null || actionsValues.contains(last)){
+        if(last == null || actionsValues.contains(last) || last == "√"){
           inputeValues.add(newValTP);
         } else {
           inputeValues.removeLast();
@@ -84,13 +117,17 @@ class Calculator with ChangeNotifier {
       notifyListeners();
       return;
     } else {
-
       // in case of an action inpute
+
       if(inputeValues.isEmpty) return;
 
-      if(inputeValues.last is String) {
+      if(inputeValues.last is String && inputeValues.last != "%" && (inputeValues.last != "√" || newValue == "-")) {
         ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("An action cannot be performed on an action ")));
+        ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(!(inputeValues.last != "√" || newValue == "-") 
+                                      ?"An action cannot be performed on an action"
+                                      : "Can not use this action on negative value"
+                                    )));
         return;
       }
 
@@ -106,11 +143,27 @@ class Calculator with ChangeNotifier {
         notifyListeners();
         return;
       }
+      
+      if(inputeValues.length > 1 && inputeValues[inputeValues.length - 2] == "√") {
+        final int squareRootIndex = inputeValues.indexOf("√");
 
+        double sqrtVal = sqrt(inputeValues[squareRootIndex + 1]);
+        inputeValues.removeLast();
+        inputeValues.add(sqrtVal);
+
+        value = value!.substring(0, squareRootIndex == -1 ? 0 : squareRootIndex) + fixeAfterDot(inputeValues.last.toString(), 4);
+        if(newValue == "=") {
+          inputeValues.clear();
+          inputeValues.add(double.parse(value!));
+          notifyListeners();
+          return;
+        }
+      }
+      
       // in case only 1 number is included
       if(inputeValues.length < 3) {
         if(newValue == "=") return;
-
+        
         value = value! + newValue;
         prevValue = value;
 
@@ -118,10 +171,28 @@ class Calculator with ChangeNotifier {
         notifyListeners();
         return;
       } else {
+        late final int presIndex;
+        presIndex = inputeValues.indexOf("%");
+        if(presIndex != -1){
+          switch(presIndex) {
+            case 1: inputeValues[0] = inputeValues[0] * (inputeValues[3] / 100); 
+            break;
+            case 3: inputeValues[2] = inputeValues[2] * (inputeValues[0] / 100); 
+            break;
+          }
+          inputeValues.removeAt(presIndex);
+        }
+
         switch(inputeValues[1]) {
           case "x": value = (inputeValues[0] * inputeValues[2]).toString();
             break;
-          case "/": value = (inputeValues[0] / inputeValues[2]).toString();
+          case "/": 
+            if(inputeValues[2] == 0) {
+              ScaffoldMessenger.of(context).clearSnackBars();
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Error - cannot divide at 0 (Infinity)")));
+              return;
+            }
+            value = (inputeValues[0] / inputeValues[2]).toString();
             break;
           case "+": value = (inputeValues[0] + inputeValues[2]).toString();
             break;
@@ -160,7 +231,7 @@ class Calculator with ChangeNotifier {
       final List<String> splited = value.split(".");
       final String remainder = splited[1];
       
-      if(number == 0) {
+      if(number == 0 || remainder == "0") {
         if(int.parse(remainder) != 0) return value;
 
         return double.parse(value).toInt().toString();
