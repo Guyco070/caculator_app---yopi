@@ -9,12 +9,11 @@ class History extends StatelessWidget {
   Widget build(BuildContext context) {
     final Calculator calculator = Provider.of<Calculator>(context);
 
-    final List<String> reversedPrevList = calculator.prevValuesList.reversed.toList();
+    final List<String> reversedPrevList = [...calculator.prevValuesList.reversed, ""];
 
     final Color color = Theme.of(context).colorScheme.primary;
 
     return SizedBox(
-      height: 250,
       width: double.maxFinite,
       child: calculator.prevValuesList.isEmpty
       ? Column(
@@ -38,48 +37,65 @@ class History extends StatelessWidget {
             ),
         ],
       )
-      : SingleChildScrollView(
-        child: Column(
-          children: [
-            Column(
-              children: reversedPrevList.map((e){
-                final List<String> seperated = e.split(" ");
-                return Padding(
-                  padding: const EdgeInsets.all(2.0),
-                  child: Material(
-                    elevation: 1,
-                    color: Colors.blueGrey.shade100,
-                    borderRadius: BorderRadius.circular(5),
-                    child: ListTile(
-                      title: Text.rich(
-                        TextSpan(
-                          children: [
-                            TextSpan(
-                              text: seperated[0],
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: color
-                              ),
+      : Stack(
+        children: [
+          Expanded(
+            child: ShaderMask(
+              shaderCallback: (Rect bounds) {
+                  return const LinearGradient(
+                    begin: Alignment.center,
+                    end: Alignment.bottomCenter,
+                    colors: <Color>[Colors.transparent,Colors.white],
+                    stops: [0.0, 1.0],
+                  ).createShader(bounds);
+              },
+              blendMode: BlendMode.dstOut,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    ...reversedPrevList.map((e){
+                        final List<String> seperated = e.split(" ");
+                        return Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: Material(
+                            elevation: 1,
+                            color: Colors.blueGrey.shade100,
+                            borderRadius: BorderRadius.circular(5),
+                            child: ListTile(
+                              title: seperated.length < 3 ? const Text("") : Text.rich(
+                                TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: seperated[0],
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        color: color
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: " = ${seperated[2]}",
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        color: color,
+                                        fontWeight: FontWeight.bold
+                                      ),
+                                    )
+                                  ]
+                                )
+                              )
                             ),
-                            TextSpan(
-                              text: " = ${seperated[2]}",
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: color,
-                                fontWeight: FontWeight.bold
-                              ),
-                            )
-                          ]
-                        )
-                      )
-                    ),
-                  ),
-                );
-              }).toList(),
+                          ),
+                        );
+                      }),
+                  ],
+                ),
+              ),
             ),
-            TextButton(onPressed: calculator.clearHistory, child: const Text("Clear History"))
-          ],
-        ),
+          ),
+          Align(
+            alignment: AlignmentDirectional.bottomCenter,
+            child: TextButton(onPressed: calculator.clearHistory, child: const Text("Clear History")))
+        ],
       ),
     );
   }

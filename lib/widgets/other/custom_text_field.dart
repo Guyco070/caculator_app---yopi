@@ -27,40 +27,37 @@ class CustomTextField extends StatelessWidget {
           const Expanded(
             flex: 2,
             child: History()),
-          Expanded(
-            flex: 1,
-            child: Material(
-              elevation: 5,
-              borderRadius: BorderRadius.circular(borderRadius),
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    IconButton(onPressed: calculator.deleteChar, 
-                      icon: Icon(
-                        Icons.backspace_outlined,
-                        color: color.withOpacity(0.9),
-                      )),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12.0),
-                      child: Text(
-                        calculator.value ?? hintText,
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: calculator.value == null ? color.withOpacity(0.7) : color,
-                          fontWeight: FontWeight.w500
-                        ),
+          Material(
+            elevation: 5,
+            borderRadius: BorderRadius.circular(borderRadius),
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  IconButton(onPressed: calculator.deleteChar, 
+                    icon: Icon(
+                      Icons.backspace_outlined,
+                      color: color.withOpacity(0.9),
+                    )),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12.0),
+                    child: Text(
+                      calculator.value ?? hintText,
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: calculator.value == null ? color.withOpacity(0.7) : color,
+                        fontWeight: FontWeight.w500
                       ),
                     ),
-                    IconButton(onPressed: calculator.clearValue, 
-                      icon: Icon(
-                        Icons.clear,
-                        color: color.withOpacity(0.9),
-                      ))
-                  ],
-                ),
+                  ),
+                  IconButton(onPressed: calculator.clearValue, 
+                    icon: Icon(
+                      Icons.clear,
+                      color: color.withOpacity(0.9),
+                    ))
+                ],
               ),
-          ),
+            ),
           const SizedBox(height: 10,)
         ],
       ),
